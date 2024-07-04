@@ -30,6 +30,10 @@ from bundesliga_tippspiel.db.match_data.Team import Team
 from bundesliga_tippspiel.Config import Config
 from bundesliga_tippspiel.utils.teams import get_team_data
 
+from sqlalchemy import text
+
+matchday_data = {}
+
 
 class UpdateTracker:
     """
@@ -116,6 +120,30 @@ def update_openligadb():
     )
 
 
+def upsert_match(session, match):
+    insert_stmt = text('''
+        INSERT INTO matches (match_id, league, season, matchday, home_team_abbreviation, away_team_abbreviation, home_current_score, away_current_score, home_ht_score, away_ht_score, home_ft_score, away_ft_score, kickoff, started, finished, locationStadium, locationCity)
+        VALUES (:match_id, :league, :season, :matchday, :home_team_abbreviation, :away_team_abbreviation, :home_current_score, :away_current_score, :home_ht_score, :away_ht_score, :home_ft_score, :away_ft_score, :kickoff, :started, :finished, :locationStadium, :locationCity)
+        ON CONFLICT(match_id, league, season, matchday) DO UPDATE SET
+        home_current_score=excluded.home_current_score,
+        away_current_score=excluded.away_current_score,
+        home_team_abbreviation=excluded.home_team_abbreviation,
+        away_team_abbreviation=excluded.away_team_abbreviation,
+        home_ht_score=excluded.home_ht_score,
+        away_ht_score=excluded.away_ht_score,
+        home_ft_score=excluded.home_ft_score,
+        away_ft_score=excluded.away_ft_score,
+        kickoff=excluded.kickoff,
+        started=excluded.started,
+        finished=excluded.finished,
+        locationStadium=excluded.locationStadium,
+        locationCity=excluded.locationCity
+    ''')
+
+    session.execute(insert_stmt, match.__dict__)
+    session.commit()
+
+
 def update_match_data(
         league: Optional[str] = None,
         season: Optional[str] = None
@@ -146,6 +174,19 @@ def update_match_data(
     except (ConnectionError, requests.exceptions.ReadTimeout):
         app.logger.warning("Failed to update match data due to failed request")
         return
+    
+    try:
+        temp_goalgetter_data = json.loads(requests.get(
+            base_url.format("getgoalgetters", league, season)
+        ).text)
+        goalgetter_data = {}
+        for e in temp_goalgetter_data:
+            # print(str(e["goalGetterId"]))
+            # print(e["goalGetterId"])
+            goalgetter_data[str(e["goalGetterId"])] = e["goalGetterName"]
+    except (ConnectionError, requests.exceptions.ReadTimeout):
+        app.logger.warning("Failed to update goal getter data due to failed request")
+        return
 
     for team_info in team_data:
         team = parse_team(team_info)
@@ -153,12 +194,19 @@ def update_match_data(
 
     for match_info in match_data:
         match = parse_match(match_info, league, int(season))
-        match = db.session.merge(match)
+        upsert_match(db.session, match)
+        # match = db.session.merge(match)
+        # print(match_info)
 
         home_score = 0
-        for goal_data in match_info["Goals"]:
+        # print(match_info["goals"])
+        for goal_data in match_info["goals"]:
+            # print(goal_data)
+            # print(str(goal_data["goalGetterID"]))
+            goal_data["goalGetterName"] = goalgetter_data[str(goal_data["goalGetterID"])] if goal_data["goalGetterID"] != 0 and str(goal_data["goalGetterID"]) in goalgetter_data else ""
             goal = parse_goal(goal_data, match)
             if goal is None:
+                # print("GOAL IS NONE")
                 continue
 
             if home_score < goal.home_score:
@@ -196,32 +244,38 @@ def parse_match(match_data: Dict[str, Any], league: str, season: int) -> Match:
     ft_home = 0
     ft_away = 0
 
-    for result in match_data["MatchResults"]:
-        if result["ResultName"] == "Halbzeit":
-            ht_home = result["PointsTeam1"]
-            ht_away = result["PointsTeam2"]
-        elif result["ResultName"] == "Endergebnis":
-            ft_home = result["PointsTeam1"]
-            ft_away = result["PointsTeam2"]
+    global matchday_data
+
+    for result in match_data["matchResults"]:
+        if result["resultName"] == "Halbzeit":
+            ht_home = result["pointsTeam1"]
+            ht_away = result["pointsTeam2"]
+        elif result["resultName"] == "Endergebnis":
+            ft_home = result["pointsTeam1"]
+            ft_away = result["pointsTeam2"]
         else:  # pragma: no cover
             pass
     cur_home = max(ht_home, ft_home)
     cur_away = max(ht_away, ft_away)
-
-    kickoff = match_data["MatchDateTimeUTC"]
+    # print(match_data)
+    kickoff = match_data["matchDateTimeUTC"].strip("Z") + "Z"
     kickoff = datetime.strptime(kickoff, "%Y-%m-%dT%H:%M:%SZ")
     started = datetime.utcnow() > kickoff
     kickoff = kickoff.strftime("%Y-%m-%d:%H-%M-%S")
 
-    home_team_abbreviation = get_team_data(match_data["Team1"]["TeamName"])[2]
-    away_team_abbreviation = get_team_data(match_data["Team2"]["TeamName"])[2]
-
+    home_team_abbreviation = get_team_data(match_data["team1"]["teamName"])[2]
+    away_team_abbreviation = get_team_data(match_data["team2"]["teamName"])[2]
+    # print(match_data["location"])
+    # print("---------------")
+    # print("GOT MATCH")
+    # print(match_data["matchID"], home_team_abbreviation, away_team_abbreviation, season, league, match_data["group"]["groupOrderID"], cur_home, cur_away, ht_home, ht_away, ft_home, ft_away, kickoff, started, match_data["matchIsFinished"])
     match = Match(
+        match_id=match_data["matchID"],
         home_team_abbreviation=home_team_abbreviation,
         away_team_abbreviation=away_team_abbreviation,
         season=season,
         league=league,
-        matchday=match_data["Group"]["GroupOrderID"],
+        matchday=match_data["group"]["groupOrderID"],
         home_current_score=cur_home,
         away_current_score=cur_away,
         home_ht_score=ht_home,
@@ -230,10 +284,21 @@ def parse_match(match_data: Dict[str, Any], league: str, season: int) -> Match:
         away_ft_score=ft_away,
         kickoff=kickoff,
         started=started,
-        finished=match_data["MatchIsFinished"]
+        finished=match_data["matchIsFinished"],
+        locationCity=match_data["location"]["locationCity"] if ("location" in match_data and match_data["location"] is not None and "locationCity" in match_data["location"] and match_data["location"]["locationCity"] is not None) else "",
+        locationStadium=match_data["location"]["locationStadium"] if ("location" in match_data and match_data["location"] is not None and "locationStadium" in match_data["location"] and match_data["location"]["locationStadium"] is not None) else "",
     )
     if match.has_started and match.minutes_since_kickoff > 1440:
         match.finished = True
+    
+    match_day = match_data["group"]["groupOrderID"]
+    match_day_name = match_data["group"]["groupName"]
+    if not league in matchday_data:
+        matchday_data[league] = {}
+    if not season in matchday_data[league]:
+        matchday_data[league][season] = {}
+    if not match_day in matchday_data[league][season]:
+        matchday_data[league][season][match_day] = match_day_name
     return match
 
 
@@ -244,10 +309,10 @@ def parse_goal(goal_data: Dict[str, Any], match: Match) -> Optional[Goal]:
     :param goal_data: The goal data to parse
     :return: The generated Goal object
     """
-    if goal_data["GoalGetterID"] == 0:
+    if goal_data["goalGetterID"] == 0:
         return None
 
-    minute = goal_data["MatchMinute"]
+    minute = goal_data["matchMinute"]
 
     # Minute defaults to 0 in case the minute data is missing.
     # This keeps the entire thing from imploding.
@@ -258,21 +323,21 @@ def parse_goal(goal_data: Dict[str, Any], match: Match) -> Optional[Goal]:
     if minute > 90:
         minute_et = minute - 90
         minute = 90
-
+    # print(goal_data)
     goal = Goal(
         home_team_abbreviation=match.home_team_abbreviation,
         away_team_abbreviation=match.away_team_abbreviation,
         season=match.season,
         league=match.league,
         matchday=match.matchday,
-        player_name=goal_data["GoalGetterName"],
+        player_name=goal_data["goalGetterName"],
         player_team_abbreviation=None,
         minute=minute,
         minute_et=minute_et,
-        home_score=goal_data["ScoreTeam1"],
-        away_score=goal_data["ScoreTeam2"],
-        own_goal=goal_data["IsOwnGoal"],
-        penalty=goal_data["IsPenalty"]
+        home_score=goal_data["scoreTeam1"],
+        away_score=goal_data["scoreTeam2"],
+        own_goal=goal_data["isOwnGoal"],
+        penalty=goal_data["isPenalty"]
     )
 
     if goal.home_score == 0 and goal.away_score == 0:
@@ -290,7 +355,7 @@ def parse_player(goal_data: Dict[str, Any], team_abbreviation: str) -> Player:
     """
     return Player(
         team_abbreviation=team_abbreviation,
-        name=goal_data["GoalGetterName"]
+        name=goal_data["goalGetterName"]
     )
 
 
@@ -300,7 +365,8 @@ def parse_team(team_data: Dict[str, Any]) -> Team:
     :param team_data: The team data to parse
     :return: The generated Team object
     """
-    name, short_name, abbrev, icons = get_team_data(team_data["TeamName"])
+
+    name, short_name, abbrev, icons = get_team_data(team_data["teamName"])
     svg, png = icons
     return Team(
         name=name,

@@ -40,13 +40,14 @@ along with bundesliga-tippspiel.  If not, see <http://www.gnu.org/licenses/>.
         {% with button_name="Anmelden" %}
             {% include "components/forms/submit_button.html" %}
         {% endwith %}
+        <a class="btn btn-primary" href="{{ url_for('settings.oauth2_authorize', provider='google') }}">Login with Google</a>
     </form>
 
     <hr>
 
     <p>
         Wenn du dein Passwort vergessen hast, kannst du es
-        <a href="{{ url_for("user_management.forgot") }}">hier</a>
+        <a class="green-link" href="{{ url_for("user_management.forgot") }}">hier</a>
         zurücksetzen.
     </p>
 

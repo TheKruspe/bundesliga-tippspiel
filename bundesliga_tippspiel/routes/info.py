@@ -93,8 +93,11 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
     @blueprint.route("/match/<string:league>/<int:season>/"
                      "<int:matchday>/<string:matchup>",
                      methods=["GET"])
+    @blueprint.route("/match/<string:league>/<int:season>/"
+                     "<int:matchday>/id/<string:match_id>",
+                     methods=["GET"])
     @login_required
-    def match(league: str, season: int, matchday: int, matchup: str):
+    def match(league: str, season: int, matchday: int, match_id: str = None, matchup: str = None):
         """
         Displays a single match
         :param league: The league of the match
@@ -104,25 +107,32 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
         :return: The Response
         """
         try:
-            home, away = matchup.split("_")
-            match_item = Match.query.filter_by(
-                league=league,
-                season=season,
-                matchday=matchday,
-                home_team_abbreviation=home,
-                away_team_abbreviation=away
-            ).options(db.joinedload(Match.goals)).first()
+            if match_id is not None:
+                match_item = Match.query.filter_by(
+                    league=league,
+                    season=season,
+                    matchday=matchday,
+                    match_id=match_id
+                ).options(db.joinedload(Match.goals)).first()
+            else:
+                home, away = matchup.split("_")
+                match_item = Match.query.filter_by(
+                    league=league,
+                    season=season,
+                    matchday=matchday,
+                    home_team_abbreviation=home,
+                    away_team_abbreviation=away
+                ).options(db.joinedload(Match.goals)).first()
             if match_item is None:
                 raise ValueError()
         except ValueError:
             return abort(404)
-
+        # print(match_item)
         bets: List[Bet] = Bet.query.filter_by(
             league=league,
             season=season,
             matchday=matchday,
-            home_team_abbreviation=home,
-            away_team_abbreviation=away
+            match_id=match_item.match_id
         ).options(db.joinedload(Bet.user)
                   .subqueryload(User.profile)
                   .subqueryload(UserProfile.favourite_team)).all()

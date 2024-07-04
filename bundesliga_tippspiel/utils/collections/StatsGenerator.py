@@ -199,10 +199,15 @@ class StatsGenerator(Leaderboard):
         points: Dict[str, List[int]] = {x.abbreviation: [] for x in self.teams}
         for bet in bets:
             for team in [
-                bet.home_team_abbreviation,
-                bet.away_team_abbreviation
+                bet.match.home_team_abbreviation,
+                bet.match.away_team_abbreviation
             ]:
                 points[team].append(bet.points)
+            # home_team = bet.match.home_team_abbreviation
+            # away_team = bet.match.away_team_abbreviation
+
+            # points[home_team].append(bet.points if bet.points is not None else 0)
+            # points[away_team].append(bet.points if bet.points is not None else 0)
         ranking = []
         for team_name, results in points.items():
             total = len(results)

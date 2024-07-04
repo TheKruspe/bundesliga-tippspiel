@@ -40,6 +40,9 @@ class Config(BaseConfig):
     """
     Extra openligadb seasons and leagues
     """
+    
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
 
     @classmethod
     def league_name(cls, league: Optional[str] = None) -> str:
@@ -53,7 +56,8 @@ class Config(BaseConfig):
         return {
             "bl1": "Bundesliga",
             "bl2": "2. Bundesliga",
-            "bl3": "3. Liga"
+            "bl3": "3. Liga",
+            "em": "Europameisterschaft",
         }.get(league, league)
 
     @classmethod
@@ -105,6 +109,10 @@ class Config(BaseConfig):
                  required or optional
         """
         base = super().environment_variables()
+        base["required"] += [
+            "GOOGLE_CLIENT_ID",
+            "GOOGLE_CLIENT_SECRET"
+        ]
         base["optional"] += [
             "OPENLIGADB_LEAGUE",
             "OPENLIGADB_SEASON",
@@ -131,6 +139,8 @@ class Config(BaseConfig):
                 Config.OPENLIGADB_EXTRA_LEAGUES.append((league, season))
             except ValueError:
                 pass
+        Config.GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+        Config.GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
         from bundesliga_tippspiel.template_extras import profile_extras
         parent.API_VERSION = "3"
         parent.STRINGS.update({

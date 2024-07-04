@@ -35,8 +35,15 @@ def get_matchday_info(league: str, season: int) -> Tuple[int, int]:
         season=season,
         league=league
     ).all()
-    max_matchday = max(all_matches, key=lambda x: x.matchday).matchday
-
+    # print(all_matches)
+    # print(league, season)
+    if len(all_matches) == 0:
+        max_matchday = 1
+    else:
+        max_matchday = max(all_matches, key=lambda x: x.matchday).matchday
+        # print(str(max_matchday) + "++++++++++++++++++++++++++++++")
+    # max_matchday = max(all_matches, key=lambda x: x.matchday).matchday
+    # print(max_matchday)
     started = [x for x in all_matches if x.has_started]
     if len(started) == 0:
         current_matchday = 1
@@ -52,7 +59,7 @@ def get_matchday_info(league: str, season: int) -> Tuple[int, int]:
         current_matchday = latest_match.matchday
         if (now - latest_match.kickoff_datetime).days >= 1:
             current_matchday = min(max_matchday, current_matchday + 1)
-
+    # print(max_matchday)
     return current_matchday, max_matchday
 
 
@@ -79,13 +86,19 @@ def validate_matchday(
         league = default_league
     if season is None:
         season = default_season
+    # print(222)
+    # print(league, season, matchday)
     current_matchday, max_matchday = get_matchday_info(league, season)
+    # print(max_matchday)
+    # print("-----")
     if matchday is None:
         matchday = current_matchday
 
-    if not 1 <= matchday <= max_matchday:
+    if not (1 <= matchday <= max_matchday):
+        # print("lalalalala")
         return None
     else:
+        # print(league, season, matchday, max_matchday)
         return league, season, matchday
 
 

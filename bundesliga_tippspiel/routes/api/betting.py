@@ -51,8 +51,7 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
         :return: The Response
         """
         bets = [
-            (x["league"], x["season"], x["matchday"],
-             x["home_team"], x["away_team"],
+            (x["match_id"], x["league"], x["season"], x["matchday"],
              x["home_score"], x["away_score"])
             for x in request.get_json()["bets"]
         ]

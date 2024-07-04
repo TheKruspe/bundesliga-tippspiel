@@ -43,9 +43,9 @@ class Bet(ModelMixin, db.Model):
     __tablename__ = "bets"
     __table_args__ = (
         db.ForeignKeyConstraint(
-            ("home_team_abbreviation", "away_team_abbreviation",
+            ("match_id",
              "league", "season", "matchday"),
-            (Match.home_team_abbreviation, Match.away_team_abbreviation,
+            (Match.match_id,
              Match.league, Match.season, Match.matchday)
         ),
     )
@@ -53,8 +53,7 @@ class Bet(ModelMixin, db.Model):
     league: str = db.Column(db.String(255), primary_key=True)
     season: int = db.Column(db.Integer, primary_key=True)
     matchday: int = db.Column(db.Integer, primary_key=True)
-    home_team_abbreviation: str = db.Column(db.String(3), primary_key=True)
-    away_team_abbreviation: str = db.Column(db.String(3), primary_key=True)
+    match_id: int = db.Column(db.Integer, primary_key=True)
     user_id: int = db.Column(
         db.Integer,
         db.ForeignKey("users.id"),
@@ -92,10 +91,8 @@ class Bet(ModelMixin, db.Model):
         """
         if isinstance(other, Bet):
             return self.user_id == other.user_id \
-                   and self.home_team_abbreviation == \
-                   other.home_team_abbreviation \
-                   and self.away_team_abbreviation == \
-                   other.away_team_abbreviation \
+                   and self.match_id == \
+                   other.match_id \
                    and self.home_score == other.home_score \
                    and self.away_score == other.away_score
         else:

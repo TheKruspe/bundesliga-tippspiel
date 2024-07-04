@@ -25,8 +25,8 @@ from bundesliga_tippspiel.db import Match, Bet
 
 def place_bets(
         user: User,
-        bets: List[Tuple[str, int, int, str, str, int, int]]
-) -> List[Tuple[str, int, int, str, str, int, int]]:
+        bets: List[Tuple[int, str, int, int, int, int]]
+) -> List[Tuple[int, str, int, int, int, int]]:
     """
     Places bets for a user
     :param user: The betting user
@@ -37,21 +37,20 @@ def place_bets(
     """
     successful = []
     matches = {
-        (x.home_team_abbreviation, x.away_team_abbreviation): x
+        x.match_id: x
         for x in Match.query.all()
     }
     for bet_tuple in bets:
-        league, season, matchday, home, away, home_score, away_score = \
+        match_id, league, season, matchday, home_score, away_score = \
             bet_tuple
-        match = matches.get((home, away))
+        match = matches.get(match_id)
         if match is None or match.has_started:
             continue  # Can't bet on started matches
         bet = Bet(
             league=league,
             season=season,
             matchday=matchday,
-            home_team_abbreviation=home,
-            away_team_abbreviation=away,
+            match_id=match_id,
             user_id=user.id,
             home_score=home_score,
             away_score=away_score

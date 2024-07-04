@@ -29,6 +29,8 @@ from bundesliga_tippspiel.utils.matchday import validate_matchday
 from bundesliga_tippspiel.db.user_generated.Bet import Bet
 from bundesliga_tippspiel.utils.bets import place_bets as _place_bets
 
+from bundesliga_tippspiel.background.openligadb import matchday_data
+
 
 def define_blueprint(blueprint_name: str) -> Blueprint:
     """
@@ -74,7 +76,8 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
         ).all()
         if len(matches) == 0:
             flash("Den angegebenen Spieltag gibt es nicht", "danger")
-            return redirect(url_for("bets.get_bets"))
+            # return redirect(url_for("betting.get_bets"))
+            return redirect(url_for("static.index"))
         matches.sort(key=lambda x: x.kickoff)
         has_started = matches[0].has_started
         all_started = matches[-1].has_started
@@ -92,17 +95,19 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
                 matchday_points += bet.points
 
         bet_match_map = {
-            (x.home_team_abbreviation, x.away_team_abbreviation): x
+            x.match_id: x
             for x in bets
         }
 
+        # print("bet_match_map")
+        # print(bet_match_map)
+
         bet_infos = []
         for match_item in matches:
-            index = (
-                match_item.home_team_abbreviation,
-                match_item.away_team_abbreviation
-            )
-            bet_infos.append((match_item, bet_match_map.get(index)))
+            bet_infos.append((match_item, bet_match_map.get(match_item.match_id)))
+
+        # print("bet_infos")
+        # print(bet_infos)
 
         leaderboard = None
         if has_started:
@@ -113,6 +118,10 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
                 DisplayBotsSettings.get_state(current_user)
             )
 
+        matchday_name = matchday
+        if league in matchday_data and season in matchday_data[league] and matchday in matchday_data[league][season]:
+            matchday_name = matchday_data[league][season][matchday]
+        
         return render_template(
             "betting/bets.html",
             matchday=matchday,
@@ -122,7 +131,8 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
             matchday_points=matchday_points,
             has_started=has_started,
             all_started=all_started,
-            leaderboard=leaderboard
+            leaderboard=leaderboard,
+            matchday_name=matchday_name,
         )
 
     @blueprint.route("/bets", methods=["POST"])
@@ -137,11 +147,12 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
         bet_data = {}
         for identifier, value in request.form.items():
             try:
-                league, _season, day, home, away, mode = identifier.split("_")
+                _match_id, league, _season, day, mode = identifier.split("_")
+                match_id = int(_match_id)
                 season = int(_season)
                 matchday = int(day)
                 score = int(value)
-                id_tuple = (league, season, matchday, home, away)
+                id_tuple = (match_id, league, season, matchday)
                 if id_tuple not in bet_data:
                     bet_data[id_tuple] = {}
                 bet_data[id_tuple][mode] = score
@@ -149,16 +160,18 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
                 continue
 
         bets = []
-        for (league, season, matchday, home, away), scores in bet_data.items():
+        for (match_id, league, season, matchday), scores in bet_data.items():
             if "home" not in scores or "away" not in scores:
                 continue
             else:
                 bets.append((
-                    league, season, matchday,
-                    home, away, scores["home"], scores["away"]
+                    match_id, league, season, matchday,
+                    scores["home"], scores["away"]
                 ))
         _place_bets(current_user, bets)
         flash("Tipps erfolgreich gesetzt", "success")
-        return redirect(url_for("betting.get_current_bets"))
+        # return redirect(url_for("betting.get_current_bets"))
+        # current_url = request.url
+        return redirect(request.url)
 
     return blueprint

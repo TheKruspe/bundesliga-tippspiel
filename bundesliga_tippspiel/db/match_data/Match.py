@@ -45,18 +45,20 @@ class Match(ModelMixin, db.Model):
 
     __tablename__ = "matches"
 
+    match_id = db.Column(db.Integer, primary_key=True)
+
     league: str = db.Column(db.String(255), primary_key=True)
     season: int = db.Column(db.Integer, primary_key=True)
     matchday: int = db.Column(db.Integer, primary_key=True)
     home_team_abbreviation: str = db.Column(
         db.String(3),
         db.ForeignKey("teams.abbreviation"),
-        primary_key=True,
+        primary_key=False,
     )
     away_team_abbreviation: str = db.Column(
         db.String(3),
         db.ForeignKey("teams.abbreviation"),
-        primary_key=True
+        primary_key=False
     )
 
     home_current_score: int = db.Column(db.Integer, nullable=False)
@@ -68,6 +70,8 @@ class Match(ModelMixin, db.Model):
     kickoff: str = db.Column(db.String(255), nullable=False)
     started: bool = db.Column(db.Boolean, nullable=False)
     finished: bool = db.Column(db.Boolean, nullable=False)
+    locationStadium: str = db.Column(db.String, nullable=False)
+    locationCity: str = db.Column(db.String, nullable=False)
 
     home_team: "Team" = db.relationship(
         "Team", foreign_keys=[home_team_abbreviation],
@@ -187,6 +191,7 @@ class Match(ModelMixin, db.Model):
         """
         return url_for(
             "info.match",
+            match_id=self.match_id,
             league=self.league,
             season=self.season,
             matchday=self.matchday,

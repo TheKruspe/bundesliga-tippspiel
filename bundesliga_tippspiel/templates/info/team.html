@@ -64,10 +64,12 @@ along with bundesliga-tippspiel.  If not, see <http://www.gnu.org/licenses/>.
         </thead>
         <tbody>
             {% for player, goal_count in goals %}
+            {% if player != "" %}
                 <tr>
                     <td>{{ player }}</td>
                     <td>{{ goal_count }}</td>
                 </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>

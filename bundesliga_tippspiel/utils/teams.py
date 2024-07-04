@@ -85,7 +85,11 @@ def get_team_data(team_name: str) -> Tuple[str, str, str, Tuple[str, str]]:
         ),
         "SCF": (
             "SC Freiburg", "SC Freiburg", "SC Freiburg",
-            wikimedia_icon_urls("de/8/88/Logo-SC_Freiburg.svg")
+            wikimedia_icon_urls("de/b/bf/SC_Freiburg_Logo.svg")
+        ),
+        "SVEB": (
+            "SV Elversberg 07", "SV Elversberg 07", "SV Elversberg",
+            wikimedia_icon_urls("commons/d/d4/SV_Elversberg_Logo_2021.svg")
         ),
         "TSG": (
             "TSG 1899 Hoffenheim", "TSG 1899 Hoffenheim", "TSG Hoffenheim",
@@ -113,7 +117,7 @@ def get_team_data(team_name: str) -> Tuple[str, str, str, Tuple[str, str]]:
         ),
         "KOE": (
             "1. FC Köln", "1. FC Köln", "1. FC Köln",
-            wikimedia_icon_urls("en/5/53/FC_Cologne_logo.svg")
+            wikimedia_icon_urls("commons/0/01/1._FC_Koeln_Logo_2014–.svg")
         ),
         "DSC": (
             "Arminia Bielefeld", "Arminia Bielefeld", "Bielefeld",
@@ -121,7 +125,7 @@ def get_team_data(team_name: str) -> Tuple[str, str, str, Tuple[str, str]]:
         ),
         "SGF": (
             "SpVgg Greuther Fürth", "SpVgg Greuther Fürth", "Greuther Fürth",
-            wikimedia_icon_urls("de/b/b1/SpVgg_Greuther_Fürth_2017.svg")
+            wikimedia_icon_urls("commons/b/b1/SpVgg_Greuther_Fürth_2017.svg")
         ),
         "BOC": (
             "VfL Bochum", "VfL Bochum", "VfL Bochum",
@@ -245,7 +249,7 @@ def get_team_data(team_name: str) -> Tuple[str, str, str, Tuple[str, str]]:
         "OSN": (
             "VfL Osnabrück", "VfL Osnabrück", "Osnabrück",
             wikimedia_icon_urls(
-                "commons/5/59/Logo_VfL_Osnabrueck_since_2017.svg")
+                "commons/4/4e/VfL_Osnabrueck_Logo_2021–.svg")
         ),
         "WÜR": (
             "Würzburger Kickers", "Würzburger Kickers", "Würzburg",
@@ -261,6 +265,61 @@ def get_team_data(team_name: str) -> Tuple[str, str, str, Tuple[str, str]]:
             wikimedia_icon_urls("de/0/01/FSV_Zwickau_Logo.svg")
         )
     }
+
+    def wikimedia_flag_urls(path):
+        return wikimedia_icon_urls(path)
+        return f"https://upload.wikimedia.org/wikipedia/{path}"
+
+    country_map = {
+        "GER": ("Deutschland", "Deutschland", "Deutschland", wikimedia_flag_urls("commons/b/ba/Flag_of_Germany.svg")),
+        "FRA": ("Frankreich", "Frankreich", "Frankreich", wikimedia_flag_urls("commons/c/c3/Flag_of_France.svg")),
+        "ITA": ("Italien", "Italien", "Italien", wikimedia_flag_urls("commons/0/03/Flag_of_Italy.svg")),
+        "ESP": ("Spanien", "Spanien", "Spanien", wikimedia_flag_urls("commons/9/9a/Flag_of_Spain.svg")),
+        "POR": ("Portugal", "Portugal", "Portugal", wikimedia_flag_urls("commons/5/5c/Flag_of_Portugal.svg")),
+        "NED": ("Niederlande", "Niederlande", "Niederlande", wikimedia_flag_urls("commons/2/20/Flag_of_the_Netherlands.svg")),
+        "BEL": ("Belgien", "Belgien", "Belgien", wikimedia_flag_urls("commons/6/65/Flag_of_Belgium.svg")),
+        "ENG": ("England", "England", "England", wikimedia_flag_urls("commons/b/be/Flag_of_England.svg")),
+        "SCO": ("Schottland", "Schottland", "Schottland", wikimedia_flag_urls("commons/1/10/Flag_of_Scotland.svg")),
+        "WAL": ("Wales", "Wales", "Wales", wikimedia_flag_urls("commons/5/59/Flag_of_Wales_2.svg")),
+        "IRL": ("Irland", "Irland", "Irland", wikimedia_flag_urls("commons/4/45/Flag_of_Ireland.svg")),
+        "NIR": ("Nordirland", "Nordirland", "Nordirland", wikimedia_flag_urls("commons/d/d4/Flag_of_Northern_Ireland.svg")),
+        "SWE": ("Schweden", "Schweden", "Schweden", wikimedia_flag_urls("commons/4/4c/Flag_of_Sweden.svg")),
+        "NOR": ("Norwegen", "Norwegen", "Norwegen", wikimedia_flag_urls("commons/d/d9/Flag_of_Norway.svg")),
+        "DEN": ("Dänemark", "Dänemark", "Dänemark", wikimedia_flag_urls("commons/9/9c/Flag_of_Denmark.svg")),
+        "FIN": ("Finnland", "Finnland", "Finnland", wikimedia_flag_urls("commons/b/bc/Flag_of_Finland.svg")),
+        "POL": ("Polen", "Polen", "Polen", wikimedia_flag_urls("commons/1/12/Flag_of_Poland.svg")),
+        "CZE": ("Tschechien", "Tschechien", "Tschechischen", wikimedia_flag_urls("commons/c/cb/Flag_of_the_Czech_Republic.svg")),
+        "SUI": ("Schweiz", "Schweiz", "Schweiz", wikimedia_flag_urls("commons/f/f3/Flag_of_Switzerland.svg")),
+        "AUT": ("Österreich", "Österreich", "Österreich", wikimedia_flag_urls("commons/4/41/Flag_of_Austria.svg")),
+        "RUS": ("Russland", "Russland", "Russland", wikimedia_flag_urls("commons/f/f3/Flag_of_Russia.svg")),
+        "UKR": ("Ukraine", "Ukraine", "Ukraine", wikimedia_flag_urls("commons/4/49/Flag_of_Ukraine.svg")),
+        "CRO": ("Kroatien", "Kroatien", "Kroatien", wikimedia_flag_urls("commons/1/1b/Flag_of_Croatia.svg")),
+        "SRB": ("Serbien", "Serbien", "Serbien", wikimedia_flag_urls("commons/f/ff/Flag_of_Serbia.svg")),
+        "BIH": ("Bosnien und Herzegowina", "Bosnien und Herzegowina", "Bosnien und Herzegowina", wikimedia_flag_urls("commons/b/bf/Flag_of_Bosnia_and_Herzegovina.svg")),
+        "MNE": ("Montenegro", "Montenegro", "Montenegro", wikimedia_flag_urls("commons/6/64/Flag_of_Montenegro.svg")),
+        "MKD": ("Nordmazedonien", "Nordmazedonien", "Nordmazedonien", wikimedia_flag_urls("commons/f/f8/Flag_of_North_Macedonia.svg")),
+        "ALB": ("Albanien", "Albanien", "Albanien", wikimedia_flag_urls("commons/3/36/Flag_of_Albania.svg")),
+        "GRE": ("Griechenland", "Griechenland", "Griechenland", wikimedia_flag_urls("commons/5/5c/Flag_of_Greece.svg")),
+        "BUL": ("Bulgarien", "Bulgarien", "Bulgarien", wikimedia_flag_urls("commons/9/9a/Flag_of_Bulgaria.svg")),
+        "ROU": ("Rumänien", "Rumänien", "Rumänien", wikimedia_flag_urls("commons/7/73/Flag_of_Romania.svg")),
+        "HUN": ("Ungarn", "Ungarn", "Ungarn", wikimedia_flag_urls("commons/c/c1/Flag_of_Hungary.svg")),
+        "SVK": ("Slowakei", "Slowakei", "Slowakei", wikimedia_flag_urls("commons/e/e6/Flag_of_Slovakia.svg")),
+        "SLO": ("Slowenien", "Slowenien", "Slowenien", wikimedia_flag_urls("commons/f/f0/Flag_of_Slovenia.svg")),
+        "BLR": ("Weißrussland", "Weißrussland", "Weißrussland", wikimedia_flag_urls("commons/8/85/Flag_of_Belarus.svg")),
+        "LTU": ("Litauen", "Litauen", "Litauen", wikimedia_flag_urls("commons/1/11/Flag_of_Lithuania.svg")),
+        "LVA": ("Lettland", "Lettland", "Lettland", wikimedia_flag_urls("commons/8/84/Flag_of_Latvia.svg")),
+        "EST": ("Estland", "Estland", "Estland", wikimedia_flag_urls("commons/8/8f/Flag_of_Estonia.svg")),
+        "MDA": ("Moldawien", "Moldawien", "Moldawien", wikimedia_flag_urls("commons/2/27/Flag_of_Moldova.svg")),
+        "ARM": ("Armenien", "Armenien", "Armenien", wikimedia_flag_urls("commons/2/2f/Flag_of_Armenia.svg")),
+        "GEO": ("Georgien", "Georgien", "Georgien", wikimedia_flag_urls("commons/0/0f/Flag_of_Georgia.svg")),
+        "AZE": ("Aserbaidschan", "Aserbaidschan", "Aserbaidschan", wikimedia_flag_urls("commons/d/dd/Flag_of_Azerbaijan.svg")),
+        "KAZ": ("Kasachstan", "Kasachstan", "Kasachstan", wikimedia_flag_urls("commons/d/d3/Flag_of_Kazakhstan.svg")),
+        "TUR": ("Türkei", "Türkei", "Türkei", wikimedia_flag_urls("commons/b/b4/Flag_of_Turkey.svg")),
+        "CYP": ("Zypern", "Zypern", "Zypern", wikimedia_flag_urls("commons/d/d4/Flag_of_Cyprus.svg")),
+        "ISR": ("Israel", "Israel", "Israel", wikimedia_flag_urls("commons/d/d4/Flag_of_Israel.svg")),
+        "NO": ("noch offen", "noch offen", "noch offen", wikimedia_flag_urls("commons/d/d4/Flag_of_Israel.svg")),
+    }
+
     openligadb_map = {
         info[0]: (
             info[1],
@@ -268,7 +327,7 @@ def get_team_data(team_name: str) -> Tuple[str, str, str, Tuple[str, str]]:
             abbreviation,
             info[3]
         )
-        for abbreviation, info in team_map.items()
+        for abbreviation, info in list(team_map.items()) + list(country_map.items())
     }
     return openligadb_map[team_name]
 

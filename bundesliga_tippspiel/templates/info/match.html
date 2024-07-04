@@ -27,6 +27,7 @@ along with bundesliga-tippspiel.  If not, see <http://www.gnu.org/licenses/>.
                     <b>{{ match.kickoff_date_string }}</b>
                     <br>
                     {{ match.kickoff_time_string }}
+                    {#{{ match.locationStadium }}, {{ match.locationCity }}#}
                 {% elif not match.finished %}
                     <div class="columns is-mobile">
                         <div class="column first">{{ match.current_score }}</div>

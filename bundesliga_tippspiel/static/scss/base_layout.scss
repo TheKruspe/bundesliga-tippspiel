@@ -30,7 +30,9 @@ body {
   flex-direction: column;
 
   padding: 0; // Makes sure that the content fills the body
-  background: url(../images/background.jpg) repeat $backup-background-color;
+  background: url(../images/background.jpg) fixed $backup-background-color;
+  background-size: cover;
+  background-position: center;
 }
 
 /**

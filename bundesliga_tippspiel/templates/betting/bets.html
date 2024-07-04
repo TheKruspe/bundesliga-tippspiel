@@ -18,7 +18,7 @@ along with bundesliga-tippspiel.  If not, see <http://www.gnu.org/licenses/>.
 #}
 
 {% extends "core/base_layout.html" %}
-{% set max_matchday = get_matchday_info(config.OPENLIGADB_LEAGUE, config.season())[1] %}
+{% set max_matchday = get_matchday_info(league, season)[1] %}
 {% block body %}
 
     <div class="columns is-mobile is-vcentered has-text-centered">
@@ -34,7 +34,7 @@ along with bundesliga-tippspiel.  If not, see <http://www.gnu.org/licenses/>.
                 </a>
             {% endif %}
         </div>
-        <div class="column is-6"><h1>Spieltag {{ matchday }}</h1></div>
+        <div class="column is-6"><h1>{{matchday_name}}</h1></div>
         <div class="column is-1">
             {% if matchday < max_matchday %}
                 <a href="{{url_for(
