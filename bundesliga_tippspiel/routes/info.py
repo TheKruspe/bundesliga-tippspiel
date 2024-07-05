@@ -127,7 +127,7 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
                 raise ValueError()
         except ValueError:
             return abort(404)
-        # print(match_item)
+        
         bets: List[Bet] = Bet.query.filter_by(
             league=league,
             season=season,

@@ -43,6 +43,7 @@ class Config(BaseConfig):
     
     GOOGLE_CLIENT_ID: str
     GOOGLE_CLIENT_SECRET: str
+    OAUTH2_PROVIDERS: Dict[str, Dict[str, str]]
 
     @classmethod
     def league_name(cls, league: Optional[str] = None) -> str:
@@ -58,6 +59,8 @@ class Config(BaseConfig):
             "bl2": "2. Bundesliga",
             "bl3": "3. Liga",
             "em": "Europameisterschaft",
+            "wm": "Weltmeisterschaft",
+            "dfb": "DFB-Pokal",
         }.get(league, league)
 
     @classmethod
@@ -111,12 +114,12 @@ class Config(BaseConfig):
         base = super().environment_variables()
         base["required"] += [
             "GOOGLE_CLIENT_ID",
-            "GOOGLE_CLIENT_SECRET"
+            "GOOGLE_CLIENT_SECRET",
         ]
         base["optional"] += [
             "OPENLIGADB_LEAGUE",
             "OPENLIGADB_SEASON",
-            "OPENLIGADB_EXTRA_LEAGUES"
+            "OPENLIGADB_EXTRA_LEAGUES",
         ]
         return base
 
@@ -141,6 +144,19 @@ class Config(BaseConfig):
                 pass
         Config.GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
         Config.GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+        Config.OAUTH2_PROVIDERS = {
+            'google': {
+                'client_id': Config.GOOGLE_CLIENT_ID,
+                'client_secret': Config.GOOGLE_CLIENT_SECRET,
+                'authorize_url': 'https://accounts.google.com/o/oauth2/auth',
+                'token_url': 'https://accounts.google.com/o/oauth2/token',
+                'userinfo': {
+                    'url': 'https://www.googleapis.com/oauth2/v3/userinfo',
+                    'email': lambda json: json['email'],
+                },
+                'scopes': ['https://www.googleapis.com/auth/userinfo.email'],
+            },
+        }
         from bundesliga_tippspiel.template_extras import profile_extras
         parent.API_VERSION = "3"
         parent.STRINGS.update({

@@ -99,15 +99,9 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
             for x in bets
         }
 
-        # print("bet_match_map")
-        # print(bet_match_map)
-
         bet_infos = []
         for match_item in matches:
             bet_infos.append((match_item, bet_match_map.get(match_item.match_id)))
-
-        # print("bet_infos")
-        # print(bet_infos)
 
         leaderboard = None
         if has_started:
@@ -118,7 +112,7 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
                 DisplayBotsSettings.get_state(current_user)
             )
 
-        matchday_name = matchday
+        matchday_name = "Spieltag " + str(matchday)
         if league in matchday_data and season in matchday_data[league] and matchday in matchday_data[league][season]:
             matchday_name = matchday_data[league][season][matchday]
         

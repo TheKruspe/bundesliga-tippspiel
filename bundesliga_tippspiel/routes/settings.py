@@ -37,36 +37,6 @@ import secrets
 from urllib.parse import urlencode
 from datetime import datetime
 
-print(Config)
-app.config['OAUTH2_PROVIDERS'] = {
-    # Google OAuth 2.0 documentation:
-    # https://developers.google.com/identity/protocols/oauth2/web-server#httprest
-    'google': {
-        'client_id': Config.GOOGLE_CLIENT_ID,
-        'client_secret': Config.GOOGLE_CLIENT_SECRET,
-        'authorize_url': 'https://accounts.google.com/o/oauth2/auth',
-        'token_url': 'https://accounts.google.com/o/oauth2/token',
-        'userinfo': {
-            'url': 'https://www.googleapis.com/oauth2/v3/userinfo',
-            'email': lambda json: json['email'],
-        },
-        'scopes': ['https://www.googleapis.com/auth/userinfo.email'],
-    },
-
-    # GitHub OAuth 2.0 documentation:
-    # https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
-    # 'github': {
-    #     'client_id': os.environ.get('GITHUB_CLIENT_ID'),
-    #     'client_secret': os.environ.get('GITHUB_CLIENT_SECRET'),
-    #     'authorize_url': 'https://github.com/login/oauth/authorize',
-    #     'token_url': 'https://github.com/login/oauth/access_token',
-    #     'userinfo': {
-    #         'url': 'https://api.github.com/user/emails',
-    #         'email': lambda json: json[0]['email'],
-    #     },
-    #     'scopes': ['user:email'],
-    # },
-}
 
 def format_datetime(value, format='%d.%m.%y'):
     """Convert a float timestamp to a formatted date string."""
@@ -180,9 +150,9 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
     @blueprint.route('/callback/<provider>')
     def oauth2_callback(provider):
         if not current_user.is_anonymous:
-            return redirect(url_for('index'))
+            return redirect(url_for('static.index'))
 
-        provider_data = app.config['OAUTH2_PROVIDERS'].get(provider)
+        provider_data = Config.OAUTH2_PROVIDERS.get(provider)
         if provider_data is None:
             abort(404)
 
@@ -191,7 +161,7 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
             for k, v in request.args.items():
                 if k.startswith('error'):
                     flash(f'{k}: {v}')
-            return redirect(url_for('index'))
+            return redirect(url_for('static.index'))
         # make sure that the state parameter matches the one we created in the
         # authorization request
         if request.args['state'] != session.get('oauth2_state'):
@@ -208,7 +178,7 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
             'code': request.args['code'],
             'grant_type': 'authorization_code',
             'redirect_uri': url_for('settings.oauth2_callback', provider=provider,
-                                    _external=True),
+                                    _external=True, _scheme='https'),
         }, headers={'Accept': 'application/json'})
         if response.status_code != 200:
             abort(401)
@@ -225,23 +195,25 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
             abort(401)
         email = provider_data['userinfo']['email'](response.json())
 
+        # app.logger.info("PROVIDER DATA - USER INFO", provider_data["userinfo"])
+
         # find or create the user in the database
         user = db.session.scalar(db.select(User).where(User.email == email))
         if user is None:
-            user = User(email=email, username=email.split('@')[0])
+            user = User(email=email, username=email.split('@')[0], confirmed=True)
             db.session.add(user)
             db.session.commit()
 
         # log the user in
         login_user(user)
-        return redirect(url_for('index'))
+        return redirect(url_for('static.index'))
 
     @blueprint.route('/authorize/<provider>')
     def oauth2_authorize(provider):
         if not current_user.is_anonymous:
-            return redirect(url_for('index'))
+            return redirect(url_for('static.index'))
 
-        provider_data = app.config['OAUTH2_PROVIDERS'].get(provider)
+        provider_data = Config.OAUTH2_PROVIDERS.get(provider)
         if provider_data is None:
             abort(404)
 
@@ -249,7 +221,6 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
         session['oauth2_state'] = secrets.token_urlsafe(16)
 
         # create a query string with all the OAuth2 parameters
-        print(provider_data)
         qs = urlencode({
             'client_id': provider_data['client_id'],
             'redirect_uri': url_for('settings.oauth2_callback', provider=provider,
@@ -258,9 +229,6 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
             'scope': ' '.join(provider_data['scopes']),
             'state': session['oauth2_state'],
         })
-        # print(provider_data['authorize_url'] + '?' + qs)
-        #http:// -> https://
-        # provider_data['authorize_url'] = provider_data['authorize_url'].replace("http://", "https://")
 
         # redirect the user to the OAuth2 provider authorization URL
         return redirect(provider_data['authorize_url'] + '?' + qs)

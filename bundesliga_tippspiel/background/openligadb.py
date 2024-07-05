@@ -181,8 +181,6 @@ def update_match_data(
         ).text)
         goalgetter_data = {}
         for e in temp_goalgetter_data:
-            # print(str(e["goalGetterId"]))
-            # print(e["goalGetterId"])
             goalgetter_data[str(e["goalGetterId"])] = e["goalGetterName"]
     except (ConnectionError, requests.exceptions.ReadTimeout):
         app.logger.warning("Failed to update goal getter data due to failed request")
@@ -196,13 +194,9 @@ def update_match_data(
         match = parse_match(match_info, league, int(season))
         upsert_match(db.session, match)
         # match = db.session.merge(match)
-        # print(match_info)
 
         home_score = 0
-        # print(match_info["goals"])
         for goal_data in match_info["goals"]:
-            # print(goal_data)
-            # print(str(goal_data["goalGetterID"]))
             goal_data["goalGetterName"] = goalgetter_data[str(goal_data["goalGetterID"])] if goal_data["goalGetterID"] != 0 and str(goal_data["goalGetterID"]) in goalgetter_data else ""
             goal = parse_goal(goal_data, match)
             if goal is None:
@@ -257,7 +251,6 @@ def parse_match(match_data: Dict[str, Any], league: str, season: int) -> Match:
             pass
     cur_home = max(ht_home, ft_home)
     cur_away = max(ht_away, ft_away)
-    # print(match_data)
     kickoff = match_data["matchDateTimeUTC"].strip("Z") + "Z"
     kickoff = datetime.strptime(kickoff, "%Y-%m-%dT%H:%M:%SZ")
     started = datetime.utcnow() > kickoff
@@ -265,10 +258,7 @@ def parse_match(match_data: Dict[str, Any], league: str, season: int) -> Match:
 
     home_team_abbreviation = get_team_data(match_data["team1"]["teamName"])[2]
     away_team_abbreviation = get_team_data(match_data["team2"]["teamName"])[2]
-    # print(match_data["location"])
-    # print("---------------")
-    # print("GOT MATCH")
-    # print(match_data["matchID"], home_team_abbreviation, away_team_abbreviation, season, league, match_data["group"]["groupOrderID"], cur_home, cur_away, ht_home, ht_away, ft_home, ft_away, kickoff, started, match_data["matchIsFinished"])
+
     match = Match(
         match_id=match_data["matchID"],
         home_team_abbreviation=home_team_abbreviation,
@@ -323,7 +313,7 @@ def parse_goal(goal_data: Dict[str, Any], match: Match) -> Optional[Goal]:
     if minute > 90:
         minute_et = minute - 90
         minute = 90
-    # print(goal_data)
+
     goal = Goal(
         home_team_abbreviation=match.home_team_abbreviation,
         away_team_abbreviation=match.away_team_abbreviation,

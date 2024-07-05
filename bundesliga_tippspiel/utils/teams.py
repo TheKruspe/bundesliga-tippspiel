@@ -263,7 +263,75 @@ def get_team_data(team_name: str) -> Tuple[str, str, str, Tuple[str, str]]:
         "ZWI": (
             "FSV Zwickau", "FSV Zwickau", "Zwickau",
             wikimedia_icon_urls("de/0/01/FSV_Zwickau_Logo.svg")
-        )
+        ),
+        "PHL": (
+            "1. FC Phönix Lübeck", "1. FC Phönix Lübeck", "Phönix Lübeck",
+            wikimedia_icon_urls("commons/9/9b/1._FC_Phoenix_Luebeck_Logo.svg")
+        ),
+        "AAA": (
+            "Alemannia Aachen", "Alemannia Aachen", "Aachen",
+            wikimedia_icon_urls("de/7/76/Logo_Alemannia_Aachen.svg")
+        ),
+        "BSV": (
+            "Bremer SV", "Bremer SV", "Bremer SV",
+            wikimedia_icon_urls("commons/a/a7/Bremer_SV_Logo.png")
+        ),
+        "FCV": (
+            "FC 08 Villingen", "FC 08 Villingen", "Villingen",
+            wikimedia_icon_urls("de/5/55/FC_08_Villingen.svg")
+        ),
+        "CZJ": (
+            "FC Carl Zeiss Jena", "FC Carl Zeiss Jena", "Jena",
+            wikimedia_icon_urls("commons/e/e4/Logo_FC_Carl_Zeiss_Jena.svg")
+        ),
+        "ENC": (
+            "FC Energie Cottbus", "FC Energie Cottbus", "Cottbus",
+            wikimedia_icon_urls("commons/5/55/Logo_Energie_Cottbus.svg")
+        ),
+        "GFC": (
+            "Greifswalder FC", "Greifswalder FC", "Greifswald",
+            wikimedia_icon_urls("commons/f/f6/Greifswalder_FC_Logo.svg")
+        ),
+        "KOF": (
+            "Kickers Offenbach", "Kickers Offenbach", "Offenbach",
+            wikimedia_icon_urls("de/f/f9/Logo_Kickers_Offenbach.svg")
+        ),
+        "PMÜ": (
+            "Preußen Münster", "Preußen Münster", "Münster",
+            wikimedia_icon_urls("de/7/7e/SC_Preussen_Muenster_Logo_2018.svg")
+        ),
+        "RWE": (
+            "Rot-Weiss Essen", "Rot-Weiss Essen", "Essen",
+            wikimedia_icon_urls("de/8/8a/Logo_Rot-Weiss_Essen.svg")
+        ),
+        "SFL": (
+            "Sportfreunde Lotte", "Sportfreunde Lotte", "Lotte",
+            wikimedia_icon_urls("commons/6/6f/Logo_SF_Lotte.svg")
+        ),
+        "SVU": (
+            "SSV Ulm 1846", "SSV Ulm 1846", "Ulm",
+            wikimedia_icon_urls("commons/6/6c/SSV_Ulm_1846_Fussball.svg")
+        ),
+        "TOT": (
+            "Teutonia Ottensen", "Teutonia Ottensen", "Ottensen",
+            wikimedia_icon_urls("commons/f/f3/FC_Teutonia_05_Ottensen_Logo.svg")
+        ),
+        "TSM": (
+            "TSV Schott Mainz", "TSV Schott Mainz", "Mainz",
+            wikimedia_icon_urls("commons/4/48/TSV_Schott_Mainz.png")
+        ),
+        "TUS": (
+            "TuS Koblenz", "TuS Koblenz", "Koblenz",
+            wikimedia_icon_urls("commons/0/04/TuS_Koblenz.svg")
+        ),
+        "VAL": (
+            "VfR Aalen", "VfR Aalen", "Aalen",
+            wikimedia_icon_urls("commons/2/2f/VfR_Aalen_Wappen.svg")
+        ),
+        "VFV": (
+            "VfV 06 Hildesheim", "VfV 06 Hildesheim", "Hildesheim",
+            wikimedia_icon_urls("de/7/74/VfV_06_Hildesheim_Logo.svg")
+        ),
     }
 
     def wikimedia_flag_urls(path):

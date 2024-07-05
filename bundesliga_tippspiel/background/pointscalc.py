@@ -69,14 +69,7 @@ def update_bet_points():
     :return: None
     """
     bets = Bet.query.options(db.joinedload(Bet.match)).all()
-    # print("bets")
     for bet in bets:
-        # print()
-        # print(bet)
-        # if bet.match is None:
-            # print("match is none")
-        # else:
-            # print(bet.match)
         bet.points = bet.evaluate()
     db.session.commit()
 
