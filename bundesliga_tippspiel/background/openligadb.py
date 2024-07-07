@@ -289,6 +289,7 @@ def parse_match(match_data: Dict[str, Any], league: str, season: int) -> Match:
         matchday_data[league][season] = {}
     if not match_day in matchday_data[league][season]:
         matchday_data[league][season][match_day] = match_day_name
+
     return match
 
 

@@ -164,8 +164,11 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
                 ))
         _place_bets(current_user, bets)
         flash("Tipps erfolgreich gesetzt", "success")
-        # return redirect(url_for("betting.get_current_bets"))
-        # current_url = request.url
-        return redirect(request.url)
+        try:
+            if league is None or season is None or matchday is None:
+                return redirect(url_for("betting.get_current_bets"))
+            return redirect(url_for("betting.get_bets", league=league, season=season, matchday=matchday))
+        except:
+            return redirect(url_for("betting.get_current_bets"))
 
     return blueprint

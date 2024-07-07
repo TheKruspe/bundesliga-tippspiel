@@ -48,6 +48,7 @@ along with bundesliga-tippspiel.  If not, see <http://www.gnu.org/licenses/>.
         {% with button_name="Registrieren", use_recaptcha=True, form_name="register-form" %}
             {% include "components/forms/submit_button.html" %}
         {% endwith %}
+        <!-- Google Button -->
         <button class="gsi-material-button" type="button">
             <div class="gsi-material-button-state"></div>
             <div class="gsi-material-button-content-wrapper">
@@ -63,7 +64,10 @@ along with bundesliga-tippspiel.  If not, see <http://www.gnu.org/licenses/>.
               <span class="gsi-material-button-contents">Sign in with Google</span>
               <span style="display: none;">Sign in with Google</span>
             </div>
-          </button>
+        </button>
+        <!-- End Google Button -->
+         
+
     </form>
     <style>
         .gsi-material-button {

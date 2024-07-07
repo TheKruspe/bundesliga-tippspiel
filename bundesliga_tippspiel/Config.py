@@ -43,6 +43,8 @@ class Config(BaseConfig):
     
     GOOGLE_CLIENT_ID: str
     GOOGLE_CLIENT_SECRET: str
+    TWITTER_CLIENT_ID: str
+    TWITTER_CLIENT_SECRET: str
     OAUTH2_PROVIDERS: Dict[str, Dict[str, str]]
 
     @classmethod
@@ -115,6 +117,8 @@ class Config(BaseConfig):
         base["required"] += [
             "GOOGLE_CLIENT_ID",
             "GOOGLE_CLIENT_SECRET",
+            "TWITTER_CLIENT_ID",
+            "TWITTER_CLIENT_SECRET",
         ]
         base["optional"] += [
             "OPENLIGADB_LEAGUE",
@@ -144,6 +148,8 @@ class Config(BaseConfig):
                 pass
         Config.GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
         Config.GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+        Config.TWITTER_CLIENT_ID = os.environ.get("TWITTER_CLIENT_ID", "")
+        Config.TWITTER_CLIENT_SECRET = os.environ.get("TWITTER_CLIENT_SECRET", "")
         Config.OAUTH2_PROVIDERS = {
             'google': {
                 'client_id': Config.GOOGLE_CLIENT_ID,
@@ -156,6 +162,17 @@ class Config(BaseConfig):
                 },
                 'scopes': ['https://www.googleapis.com/auth/userinfo.email'],
             },
+            'twitter': {
+                'client_id': Config.TWITTER_CLIENT_ID,
+                'client_secret': Config.TWITTER_CLIENT_SECRET,
+                'authorize_url': 'https://api.twitter.com/oauth/authenticate',
+                'token_url': 'https://api.twitter.com/oauth/access_token',
+                'userinfo': {
+                    'url': 'https://api.twitter.com/1.1/account/verify_credentials.json',
+                    'email': lambda json: json['email'],
+                },
+                'scopes': ['email'],
+            }
         }
         from bundesliga_tippspiel.template_extras import profile_extras
         parent.API_VERSION = "3"
@@ -178,7 +195,7 @@ class Config(BaseConfig):
                                "{} und {} Zeichen lang sein.",
             "passwords_do_not_match": "Die angegebenen Passwörter stimmen "
                                       "nicht miteinander überein.",
-            "email_already_in_use": "Die gewählte Email-Address wird bereits "
+            "email_already_in_use": "Die gewählte Email-Addresse wird bereits "
                                     "verwendet.",
             "username_already_exists": "Der ausgewählte Username existiert "
                                        "bereits.",
