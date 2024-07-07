@@ -79,7 +79,9 @@ along with bundesliga-tippspiel.  If not, see <http://www.gnu.org/licenses/>.
         {% for reminder_type, reminder in reminder_settings.items() %}
             {% with label_name=reminder_type.value.title(), var_name=reminder_type.value,
                     checked=reminder is not none and reminder.active %}
+                {% if reminder_type.value.title() != "Telegram" %}
                 {% include "components/forms/bool_input.html" %}
+                {% endif %}
             {% endwith %}
         {% endfor %}
         {% with button_name="Aktualisieren" %}
@@ -89,7 +91,7 @@ along with bundesliga-tippspiel.  If not, see <http://www.gnu.org/licenses/>.
 
     <hr>
 
-    <h2>Telegram Chat ID</h2>
+    {#<h2>Telegram Chat ID</h2>
     <p>
         Um Erinnerungen mittels Telegram zu erhalten, musst du zunächst
         deine Telegram Chat ID registrieren.
@@ -113,7 +115,7 @@ along with bundesliga-tippspiel.  If not, see <http://www.gnu.org/licenses/>.
 
     <hr>
 
-    <h2>Andere Einstellungen</h2>
+   <h2>Andere Einstellungen</h2>
 
     <form method="post" action="{{ url_for("settings.misc_settings") }}">
         {% with label_name="Bots anzeigen", var_name="display_bots",
@@ -125,7 +127,7 @@ along with bundesliga-tippspiel.  If not, see <http://www.gnu.org/licenses/>.
         {% endwith %}
     </form>
 
-    <hr>
+    <hr>#}
 
     <h2>Passwort ändern</h2>
 

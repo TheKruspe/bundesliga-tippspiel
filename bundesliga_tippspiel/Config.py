@@ -41,6 +41,7 @@ class Config(BaseConfig):
     Extra openligadb seasons and leagues
     """
     
+    EMAIL_SENDER: str
     GOOGLE_CLIENT_ID: str
     GOOGLE_CLIENT_SECRET: str
     TWITTER_CLIENT_ID: str
@@ -146,6 +147,7 @@ class Config(BaseConfig):
                 Config.OPENLIGADB_EXTRA_LEAGUES.append((league, season))
             except ValueError:
                 pass
+        Config.EMAIL_SENDER = os.environ.get("EMAIL_SENDER", "")
         Config.GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
         Config.GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
         Config.TWITTER_CLIENT_ID = os.environ.get("TWITTER_CLIENT_ID", "")

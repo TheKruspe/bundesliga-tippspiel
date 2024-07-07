@@ -56,7 +56,7 @@ class ReminderSettings(ModelMixin, db.Model):
     )
     reminder_type = db.Column(db.Enum(ReminderType), primary_key=True)
 
-    active = db.Column(db.Boolean, nullable=False, default=True)
+    active = db.Column(db.Boolean, nullable=False, default=False)
     reminder_time: int = db.Column(db.Integer, nullable=False, default=86400)
     last_reminder: str = db.Column(db.String(19), nullable=False,
                                    default="1970-01-01:01-01-01")
@@ -165,13 +165,15 @@ class ReminderSettings(ModelMixin, db.Model):
                     Config.SMTP_HOST,
                     Config.SMTP_ADDRESS,
                     Config.SMTP_PASSWORD,
-                    Config.SMTP_PORT
+                    Config.SMTP_PORT,
+                    Config.EMAIL_SENDER
                 )
             except SMTPAuthenticationError:
                 app.logger.error("Invalid SMTP settings, failed to send email")
         elif self.reminder_type == ReminderType.TELEGRAM:
-            telegram = TelegramChatId.query.filter_by(user=self.user).first()
-            if telegram is not None:
-                message = BeautifulSoup(message, "html.parser").text
-                message = "\n".join([x.strip() for x in message.split("\n")])
-                telegram.send_message(message)
+            pass
+            # telegram = TelegramChatId.query.filter_by(user=self.user).first()
+            # if telegram is not None:
+            #     message = BeautifulSoup(message, "html.parser").text
+            #     message = "\n".join([x.strip() for x in message.split("\n")])
+            #     telegram.send_message(message)

@@ -171,7 +171,8 @@ def __handle_reminder(
                 Config.SMTP_HOST,
                 Config.SMTP_ADDRESS,
                 Config.SMTP_PASSWORD,
-                Config.SMTP_PORT
+                Config.SMTP_PORT,
+                Config.EMAIL_SENDER
             )
 
             telegram = user.telegram_chat_id

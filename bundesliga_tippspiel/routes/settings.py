@@ -92,7 +92,7 @@ def define_blueprint(blueprint_name: str) -> Blueprint:
                     user_id=current_user.id,
                     reminder_type=reminder_type,
                     active=reminder_state,
-                    reminder_time=hours
+                    reminder_time= int(hours * 3600)
                 )
                 db.session.merge(setting)
             db.session.commit()
